@@ -1,0 +1,235 @@
+.chatbotContainer {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.chatToggleButton {
+  background: linear-gradient(45deg, #007bff, #0056b3); /* Blue gradient */
+  color: white;
+  border: none;
+  border-radius: 30px; /* Make it more of a rounded rectangle now */
+  width: 120px; /* Increased width */
+  height: 48px; /* Increased height */
+  padding: 0 15px; /* Add padding for text */
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease; /* Transition all properties smoothly */
+}
+
+.chatToggleButton:hover {
+  background: linear-gradient(45deg, #0056b3, #003366); /* Darker gradient on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Larger shadow on hover */
+  transform: translateY(-5px); /* Lift button on hover */
+}
+
+/* Speech bubble styling */
+.speechBubbleContainer {
+  position: absolute;
+  bottom: 60px; /* Position above the button */
+  right: 0;
+  width: 120px; /* Adjust width as needed */
+  text-align: center;
+  pointer-events: none; /* Allow clicks to pass through */
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.speechBubbleContainer.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.speechBubble {
+  background-color: #f0f2f5; /* Light grey */
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 0.85em;
+  position: relative;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.speechBubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px; /* Position the tail */
+  right: 20px; /* Align tail with button */
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #f0f2f5; /* Tail color */
+}
+
+.chatWindow {
+  position: fixed;
+  bottom: 90px; /* Above the toggle button */
+  right: 20px;
+  width: 350px;
+  height: 500px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chatHeader {
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.chatHeader h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.messageList {
+  flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+.message {
+  max-width: 80%;
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 15px;
+  line-height: 1.4;
+}
+
+.user {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+  border-bottom-right-radius: 2px;
+}
+
+.bot {
+  background-color: #e2e6ea;
+  color: #333;
+  align-self: flex-start;
+  margin-right: auto;
+  border-bottom-left-radius: 2px;
+}
+
+.chatInputContainer {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+.chatInput {
+  flex-grow: 1;
+  border: 1px solid #ced4da;
+  border-radius: 20px;
+  padding: 8px 15px;
+  margin-right: 10px;
+  font-size: 14px;
+}
+
+.chatInput:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.sendButton {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.sendButton:disabled {
+  background-color: #94d3a2;
+  cursor: not-allowed;
+}
+
+.sources {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.5);
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.bot .sources {
+  border-top: 1px dashed rgba(0, 0, 0, 0.2);
+  color: #555;
+}
+
+.sources h4 {
+  margin: 0 0 5px 0;
+  font-size: 0.9em;
+}
+
+.sourceItem {
+  margin-bottom: 3px;
+  word-break: break-all;
+}
+
+.selectedTextDisplay {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #e9ecef;
+  padding: 5px 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 0.9em;
+  color: #333;
+  border: 1px solid #e0e0e0; /* Revert border */
+}
+
+.selectedTextDisplay p {
+  margin: 0;
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.clearSelectedTextButton {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 3px 8px;
+  cursor: pointer;
+  font-size: 0.8em;
+}
+
+.clearSelectedTextButton:hover {
+  background-color: #c82333;
+}
