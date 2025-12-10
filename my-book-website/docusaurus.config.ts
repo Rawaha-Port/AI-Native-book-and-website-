@@ -60,6 +60,11 @@ const config: Config = {
           label: 'GitHub',
           position: 'right',
         },
+        {
+          type: 'custom-auth-status',
+          position: 'right',
+          className: 'navbar__item--auth-status', // Optional: for custom styling
+        },
       ],
     },
     footer: {

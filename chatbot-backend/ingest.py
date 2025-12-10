@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
-from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_qdrant import Qdrant
 
 load_dotenv()
@@ -22,7 +22,7 @@ def ingest_data():
     chunked_documents = text_splitter.split_documents(documents)
 
     # 3. Generate embeddings and store in Qdrant
-    embeddings = OpenAIEmbeddings()
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=os.environ.get("GEMINI_API_KEY"))
     qdrant = Qdrant.from_documents(
         chunked_documents,
         embeddings,

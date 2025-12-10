@@ -4,4 +4,7 @@ pydantic
 python-dotenv
 psycopg2-binary
 qdrant-client
-openai
+langchain-google-genai
+langchain
+langchain-community
+firebase-admin
