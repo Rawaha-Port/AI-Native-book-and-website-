@@ -23,9 +23,9 @@
 
 **Purpose**: Environment and dependency configuration for both frontend and backend.
 
-- [ ] T001 [P] In `chatbot-backend/`, add `psycopg2-binary` to handle PostgreSQL connections.
-- [ ] T002 [P] In `my-book-website/`, install an HTTP client like `axios` for API communication.
-- [ ] T003 In `chatbot-backend/.env`, add placeholders for `DATABASE_URL` and `BETTER_AUTH_SECRET`.
+- [x] T001 [P] In `chatbot-backend/`, add `psycopg2-binary` to handle PostgreSQL connections.
+- [x] T002 [P] In `my-book-website/`, install an HTTP client like `axios` for API communication.
+- [x] T003 In `chatbot-backend/.env`, add placeholders for `DATABASE_URL` and `BETTER_AUTH_SECRET`.
 
 ---
 
@@ -35,11 +35,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 In `chatbot-backend/`, configure a database migration tool (e.g., Alembic) and create an initial migration in `chatbot-backend/migrations/` to generate the `users` and `user_profiles` tables as defined in `data-model.md`.
-- [ ] T005 [P] In `my-book-website/src/contexts/`, create the `AuthContext.tsx` to manage global user state (e.g., `isAuthenticated`, `currentUser`).
-- [ ] T006 [P] In `chatbot-backend/main.py`, implement CORS middleware to allow requests from `http://localhost:3000`.
-- [ ] T007 [P] In `chatbot-backend/src/core/`, create `better_auth_instance.ts` (or equivalent in a Node.js sub-process) to configure and export the self-hosted Better Auth service instance.
-- [ ] T008 Implement the core `auth_service.py` in `chatbot-backend/src/services/` to act as a wrapper for interacting with the Better Auth service.
+- [x] T004 In `chatbot-backend/`, configure a database migration tool (e.g., Alembic) and create an initial migration in `chatbot-backend/migrations/` to generate the `users` and `user_profiles` tables as defined in `data-model.md`.
+- [x] T005 [P] In `my-book-website/src/contexts/`, create the `AuthContext.tsx` to manage global user state (e.g., `isAuthenticated`, `currentUser`).
+- [x] T006 [P] In `chatbot-backend/main.py`, implement CORS middleware to allow requests from `http://localhost:3000`.
+- [x] T007 [P] In `chatbot-backend/src/core/`, create `better_auth_instance.ts` (or equivalent in a Node.js sub-process) to configure and export the self-hosted Better Auth service instance.
+- [x] T008 Implement the core `auth_service.py` in `chatbot-backend/src/services/` to act as a wrapper for interacting with the Better Auth service.
 
 **Checkpoint**: Foundation ready - user story implementation can now begin.
 
@@ -53,11 +53,11 @@
 
 ### Implementation for User Story 1
 
-- [ ] T009 [P] [US1] Create the signup page file at `my-book-website/src/pages/signup.tsx`.
-- [ ] T010 [P] [US1] Create the `SignupForm.tsx` component in `my-book-website/src/components/Auth/` containing fields for email, password, and all user profile questions.
-- [ ] T011 [US1] Implement the `POST /api/v1/auth/signup` endpoint in `chatbot-backend/src/api/auth.py`.
-- [ ] T012 [US1] In `chatbot-backend/src/services/auth_service.py`, implement the `signup` method to orchestrate creating the user via Better Auth and saving the user and their profile data to the database.
-- [ ] T013 [US1] Integrate the `SignupForm.tsx` component into the `my-book-website/src/pages/signup.tsx` page and connect its API calls. On success, update the `AuthContext`.
+- [x] T009 [P] [US1] Create the signup page file at `my-book-website/src/pages/signup.tsx`.
+- [x] T010 [P] [US1] Create the `SignupForm.tsx` component in `my-book-website/src/components/Auth/` containing fields for email, password, and all user profile questions.
+- [x] T011 [US1] Implement the `POST /api/v1/auth/signup` endpoint in `chatbot-backend/src/api/auth.py`.
+- [x] T012 [US1] In `chatbot-backend/src/services/auth_service.py`, implement the `signup` method to orchestrate creating the user via Better Auth and saving the user and their profile data to the database.
+- [x] T013 [US1] Integrate the `SignupForm.tsx` component into the `my-book-website/src/pages/signup.tsx` page and connect its API calls. On success, update the `AuthContext`.
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently.
 
@@ -71,11 +71,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [P] [US2] Create the signin page file at `my-book-website/src/pages/signin.tsx`.
-- [ ] T015 [P] [US2] Create the `SigninForm.tsx` component in `my-book-website/src/components/Auth/` with fields for email and password.
-- [ ] T016 [US2] Implement the `POST /api/v1/auth/signin` endpoint in `chatbot-backend/src/api/auth.py`.
-- [ ] T017 [US2] In `chatbot-backend/src/services/auth_service.py`, implement the `signin` method to authenticate via Better Auth, retrieve the user's profile from the database, and return it.
-- [ ] T018 [US2] Integrate `SigninForm.tsx` into `my-book-website/src/pages/signin.tsx`. On successful login, populate the `AuthContext` with the user's data.
+- [x] T014 [P] [US2] Create the signin page file at `my-book-website/src/pages/signin.tsx`.
+- [x] T015 [P] [US2] Create the `SigninForm.tsx` component in `my-book-website/src/components/Auth/` with fields for email and password.
+- [x] T016 [US2] Implement the `POST /api/v1/auth/signin` endpoint in `chatbot-backend/src/api/auth.py`.
+- [x] T017 [US2] In `chatbot-backend/src/services/auth_service.py`, implement the `signin` method to authenticate via Better Auth, retrieve the user's profile from the database, and return it.
+- [x] T018 [US2] Integrate `SigninForm.tsx` into `my-book-website/src/pages/signin.tsx`. On successful login, populate the `AuthContext` with the user's data.
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently.
 
@@ -89,11 +89,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [P] [US3] Create the user profile page at `my-book-website/src/pages/profile.tsx`.
-- [ ] T020 [P] [US3] Create a `ProfileForm.tsx` component in `my-book-website/src/components/Auth/` to display and allow editing of the user profile data.
-- [ ] T021 [US3] Implement the `GET /api/v1/users/me` and `PUT /api/v1/users/me` endpoints in `chatbot-backend/src/api/auth.py`.
-- [ ] T022 [US3] In `chatbot-backend/src/services/auth_service.py`, implement the `get_profile` and `update_profile` methods.
-- [ ] T023 [US3] Integrate `ProfileForm.tsx` into `my-book-website/src/pages/profile.tsx`, populating it with data from the `AuthContext` and calling the PUT endpoint on save.
+- [x] T019 [P] [US3] Create the user profile page at `my-book-website/src/pages/profile.tsx`.
+- [x] T020 [P] [US3] Create a `ProfileForm.tsx` component in `my-book-website/src/components/Auth/` to display and allow editing of the user profile data.
+- [x] T021 [US3] Implement the `GET /api/v1/users/me` and `PUT /api/v1/users/me` endpoints in `chatbot-backend/src/api/auth.py`.
+- [x] T022 [US3] In `chatbot-backend/src/services/auth_service.py`, implement the `get_profile` and `update_profile` methods.
+- [x] T023 [US3] Integrate `ProfileForm.tsx` into `my-book-website/src/pages/profile.tsx`, populating it with data from the `AuthContext` and calling the PUT endpoint on save.
 
 **Checkpoint**: All user stories should now be independently functional.
 
@@ -103,10 +103,10 @@
 
 **Purpose**: Improvements that affect multiple user stories and overall user experience.
 
-- [ ] T024 Review Docusaurus layouts to ensure book content in `my-book-website/docs/` remains public and accessible without login, as per requirement FR-009.
-- [ ] T025 [P] Implement loading indicators in all auth forms in `my-book-website/src/components/Auth/`.
-- [ ] T026 [P] Implement user-friendly error message displays for API failures in all auth forms in `my-book-website/src/components/Auth/`.
-- [ ] T027 Implement a "Sign Out" button (e.g., in the navbar) that clears the `AuthContext` and session cookies.
+- [x] T024 Review Docusaurus layouts to ensure book content in `my-book-website/docs/` remains public and accessible without login, as per requirement FR-009.
+- [x] T025 [P] Implement loading indicators in all auth forms in `my-book-website/src/components/Auth/`.
+- [x] T026 [P] Implement user-friendly error message displays for API failures in all auth forms in `my-book-website/src/components/Auth/`.
+- [x] T027 Implement a "Sign Out" button (e.g., in the navbar) that clears the `AuthContext` and invalidates the session cookie.
 
 ---
 ## Dependencies & Execution Order

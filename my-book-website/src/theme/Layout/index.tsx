@@ -16,6 +16,7 @@ import ErrorPageContent from '@theme/ErrorPageContent';
 import type {Props} from '@theme/Layout';
 import styles from './styles.module.css';
 import Chatbot from '../../components/Chatbot'; // Import the Chatbot component
+import { AuthProvider } from '../../contexts/AuthContext'; // NEW IMPORT
 
 export default function Layout(props: Props): ReactNode {
   const {
@@ -49,30 +50,32 @@ export default function Layout(props: Props): ReactNode {
   }, []);
 
   return (
-    <LayoutProvider>
-      <PageMetadata title={title} description={description} />
+    <AuthProvider> {/* Wrap the entire application with AuthProvider */}
+      <LayoutProvider>
+        <PageMetadata title={title} description={description} />
 
-      <SkipToContent />
+        <SkipToContent />
 
-      <AnnouncementBar />
+        <AnnouncementBar />
 
-      <Navbar />
+        <Navbar />
 
-      <div
-        id={SkipToContentFallbackId}
-        className={clsx(
-          ThemeClassNames.layout.main.container,
-          ThemeClassNames.wrapper.main,
-          styles.mainWrapper,
-          wrapperClassName,
-        )}>
-        <ErrorBoundary fallback={(params) => <ErrorPageContent {...params} />}>
-          {children}
-        </ErrorBoundary>
-      </div>
+        <div
+          id={SkipToContentFallbackId}
+          className={clsx(
+            ThemeClassNames.layout.main.container,
+            ThemeClassNames.wrapper.main,
+            styles.mainWrapper,
+            wrapperClassName,
+          )}>
+          <ErrorBoundary fallback={(params) => <ErrorPageContent {...params} />}>
+            {children}
+          </ErrorBoundary>
+        </div>
 
-      {!noFooter && <Footer />}
-      <Chatbot selectedText={selectedText} /> {/* Pass selectedText to Chatbot */}
-    </LayoutProvider>
+        {!noFooter && <Footer />}
+        <Chatbot selectedText={selectedText} /> {/* Pass selectedText to Chatbot */}
+      </LayoutProvider>
+    </AuthProvider>
   );
 }
