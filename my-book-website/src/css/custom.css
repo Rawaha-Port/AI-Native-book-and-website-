@@ -112,6 +112,7 @@
   background-color: var(--ifm-color-primary);
   color: white;
   border: none;
+  font-size: 1.1rem; /* Increased font size */
 }
 
 .button--action:hover {

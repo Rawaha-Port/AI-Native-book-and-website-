@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useAuth } from '../../contexts/AuthContext'; // Adjust path as needed
-import { useHistory } from '@docusaurus/router'; // Docusaurus router for navigation
+import { useAuth } from '../../contexts/AuthContext';
+import { useHistory } from '@docusaurus/router';
 
 interface ProfileData {
   languages: { language: string; level: string }[];
   frameworks: string[];
   experience_years: string;
-  devices: string[];
+  // devices: string[]; // Removed
   architecture_familiarity: string[];
 }
 
 const SignupForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
+  const [fullName, setFullName] = useState<string>(''); // New state for full name
   const [password, setPassword] = useState<string>('');
   const [profileData, setProfileData] = useState<ProfileData>({
     languages: [{ language: '', level: 'Beginner' }],
     frameworks: [''],
     experience_years: '',
-    devices: [''],
+    // devices: [], // Removed
     architecture_familiarity: [''],
   });
   const [error, setError] = useState<string | null>(null);
@@ -41,21 +42,24 @@ const SignupForm: React.FC = () => {
     setProfileData({ ...profileData, languages: newLanguages });
   };
 
-  const handleArrayChange = (field: keyof ProfileData, index: number, value: string) => {
-    const newArray = [...(profileData[field] as string[])];
+  // handleArrayChange and addArrayItem/removeArrayItem are still generic but 'devices' won't use them
+  const handleArrayChange = (field: Exclude<keyof ProfileData, 'languages'>, index: number, value: string) => {
+    const currentArray = profileData[field] as string[];
+    const newArray = [...currentArray];
     newArray[index] = value;
     setProfileData({ ...profileData, [field]: newArray });
   };
 
-  const addArrayItem = (field: keyof ProfileData) => {
-    setProfileData({ ...profileData, [field]: [...(profileData[field] as string[]), ''] });
+  const addArrayItem = (field: Exclude<keyof ProfileData, 'languages'>) => {
+    const currentArray = profileData[field] as string[];
+    setProfileData({ ...profileData, [field]: [...currentArray, ''] });
   };
 
-  const removeArrayItem = (field: keyof ProfileData, index: number) => {
-    const newArray = (profileData[field] as string[]).filter((_, i) => i !== index);
+  const removeArrayItem = (field: Exclude<keyof ProfileData, 'languages'>, index: number) => {
+    const currentArray = profileData[field] as string[];
+    const newArray = currentArray.filter((_, i) => i !== index);
     setProfileData({ ...profileData, [field]: newArray });
   };
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,14 +68,14 @@ const SignupForm: React.FC = () => {
     try {
       const response = await axios.post('/api/v1/auth/signup', {
         email,
+        full_name: fullName, // Include full_name
         password,
         profile_data: profileData,
       });
 
-      // Assuming the backend returns user data and a token
       const { user, token } = response.data;
       signIn(user, token);
-      history.push('/profile'); // Redirect to profile page on success
+      history.push('/profile');
     } catch (err: any) {
       console.error('Signup error:', err.response?.data || err.message);
       setError(err.response?.data?.detail || 'Signup failed');
@@ -97,6 +101,17 @@ const SignupForm: React.FC = () => {
           />
         </div>
         <div className="auth-form-group">
+          <label htmlFor="fullName">Full Name:</label> {/* New Full Name field */}
+          <input
+            type="text"
+            id="fullName"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
+            disabled={loading}
+          />
+        </div>
+        <div className="auth-form-group">
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -111,9 +126,9 @@ const SignupForm: React.FC = () => {
         {/* User Profile Questions */}
         <h3>Tell us about your background:</h3>
 
-        {/* Languages */}
+        {/* Programming Languages (formerly Languages) */}
         <div className="auth-form-group">
-          <label>Languages:</label>
+          <label>Programming Languages:</label> {/* Changed label */}
           {profileData.languages.map((lang, index) => (
             <div key={index} className="auth-form-array-item">
               <input
@@ -169,7 +184,8 @@ const SignupForm: React.FC = () => {
           />
         </div>
 
-        {/* Devices */}
+        {/* Devices (Removed) */}
+        {/*
         <div className="auth-form-group">
           <label>Devices:</label>
           {profileData.devices.map((item, index) => (
@@ -186,6 +202,7 @@ const SignupForm: React.FC = () => {
           ))}
           <button type="button" className="button button--sm button--secondary" onClick={() => addArrayItem('devices')} disabled={loading}>Add Device</button>
         </div>
+        */}
 
         {/* Architecture Familiarity */}
         <div className="auth-form-group">

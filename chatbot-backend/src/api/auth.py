@@ -86,17 +86,18 @@ class UserProfileCreate(BaseModel):
     languages: List[LanguageSkill] = []
     frameworks: List[str] = []
     experience_years: Optional[str] = None
-    devices: List[str] = []
     architecture_familiarity: List[str] = []
 
 class UserCreate(BaseModel):
     email: EmailStr
+    full_name: str
     password: str
     profile_data: UserProfileCreate
 
 class UserResponse(BaseModel):
     id: str
     email: EmailStr
+    full_name: str
     # Add other fields if needed, but avoid password_hash
 
 # --- External Service Imports ---
@@ -128,6 +129,7 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     # 4. Create User in our database
     db_user = User(
         email=user_data.email,
+        full_name=user_data.full_name,
         password_hash="***", # Placeholder, as password handling is externalized
         better_auth_id=better_auth_id
     )
@@ -140,7 +142,6 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
         languages=user_data.profile_data.languages.json(), # Convert Pydantic model to JSON string/object
         frameworks=user_data.profile_data.frameworks,
         experience_years=user_data.profile_data.experience_years,
-        devices=user_data.profile_data.devices,
         architecture_familiarity=user_data.profile_data.architecture_familiarity,
     )
     db.add(db_profile)
@@ -149,7 +150,7 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
 
     # Note: Token generation/handling is done in auth_service and might be returned here
     # For now, we just return the user details.
-    return UserResponse(id=str(db_user.id), email=db_user.email)
+    return UserResponse(id=str(db_user.id), email=db_user.email, full_name=db_user.full_name)
 
 
 class LoginResponse(BaseModel):
@@ -185,12 +186,11 @@ async def signin(auth_details: AuthDetails, db: Session = Depends(get_db)):
             languages=db_profile_orm.languages, # Assuming JSONB is automatically converted
             frameworks=db_profile_orm.frameworks,
             experience_years=db_profile_orm.experience_years,
-            devices=db_profile_orm.devices,
             architecture_familiarity=db_profile_orm.architecture_familiarity,
         )
 
     return LoginResponse(
-        user=UserResponse(id=str(db_user.id), email=db_user.email),
+        user=UserResponse(id=str(db_user.id), email=db_user.email, full_name=db_user.full_name),
         profile=profile_data,
         token=session_token
     )
@@ -211,11 +211,10 @@ async def read_users_me(current_user: User = Depends(get_current_user), db: Sess
             languages=db_profile_orm.languages,
             frameworks=db_profile_orm.frameworks,
             experience_years=db_profile_orm.experience_years,
-            devices=db_profile_orm.devices,
             architecture_familiarity=db_profile_orm.architecture_familiarity,
         )
     return LoginResponse(
-        user=UserResponse(id=str(current_user.id), email=current_user.email),
+        user=UserResponse(id=str(current_user.id), email=current_user.email, full_name=current_user.full_name),
         profile=profile_data,
         token="" # Token not sent on /me endpoint
     )
@@ -233,7 +232,6 @@ async def update_users_me(
     db_profile.languages = profile_update.languages.json()
     db_profile.frameworks = profile_update.frameworks
     db_profile.experience_years = profile_update.experience_years
-    db_profile.devices = profile_update.devices
     db_profile.architecture_familiarity = profile_update.architecture_familiarity
     db_profile.updated_at = datetime.utcnow() # Update timestamp
 
