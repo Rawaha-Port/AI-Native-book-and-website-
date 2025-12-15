@@ -5,11 +5,11 @@ import axios from 'axios'; // New import
 interface User {
   id: string;
   email: string;
+  full_name: string; // Added full_name
   // Add other user profile properties as needed from the backend
   languages?: { language: string; level: string }[];
   frameworks?: string[];
   experience_years?: string;
-  devices?: string[];
   architecture_familiarity?: string[];
 }
 

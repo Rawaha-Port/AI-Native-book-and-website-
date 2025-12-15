@@ -1,0 +1,20 @@
+.translateButton {
+  margin-bottom: 1rem;
+  background-color: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--ifm-border-radius);
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.translateButton:hover {
+  background-color: var(--ifm-color-primary-dark);
+}
+
+.translateButton:disabled {
+  background-color: var(--ifm-color-gray-500);
+  cursor: not-allowed;
+}

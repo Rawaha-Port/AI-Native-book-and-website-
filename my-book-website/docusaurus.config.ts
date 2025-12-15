@@ -56,7 +56,7 @@ const config: Config = {
           label: 'Book',
         },
         {
-          href: 'https://github.com/example/my-book-website',
+          href: 'https://github.com/Rawaha-Port/AI-Native-book-and-website-',
           label: 'GitHub',
           position: 'right',
         },

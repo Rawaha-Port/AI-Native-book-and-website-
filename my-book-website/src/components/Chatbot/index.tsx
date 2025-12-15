@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
-import axios from 'axios'; // Assuming axios is installed
+import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContext'; // Import useAuth
 
 interface Message {
   text: string;
@@ -13,12 +14,13 @@ interface ChatbotProps {
 }
 
 const Chatbot: React.FC<ChatbotProps> = ({ selectedText }) => {
+  const { isAuthenticated, currentUser } = useAuth(); // Use useAuth hook
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentSelectedText, setCurrentSelectedText] = useState<string | null>(null);
-  const [hasOpenedBefore, setHasOpenedBefore] = useState(false); // New state to track first open
+  const [hasOpenedBefore, setHasOpenedBefore] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,6 +35,14 @@ const Chatbot: React.FC<ChatbotProps> = ({ selectedText }) => {
       setIsOpen(true);
     }
   }, [selectedText]);
+
+  const generateWelcomeMessage = () => {
+    if (isAuthenticated && currentUser?.full_name) {
+      return `Welcome, ${currentUser.full_name}! How can I assist you with this book?`;
+    } else {
+      return 'Welcome! How can I assist you with this book? We suggest logging in for a better experience.';
+    }
+  };
 
   const handleSendMessage = async () => {
     if (input.trim() === '' && !currentSelectedText) return;
@@ -73,17 +83,17 @@ const Chatbot: React.FC<ChatbotProps> = ({ selectedText }) => {
 
   const toggleChat = () => {
     setIsOpen(!isOpen);
-    if (!isOpen && !hasOpenedBefore) { // If opening for the first time
-      setIsLoading(true); // Show typing indicator
-      setHasOpenedBefore(true); // Mark as opened
+    if (!isOpen && !hasOpenedBefore) {
+      setIsLoading(true);
+      setHasOpenedBefore(true);
       setTimeout(() => {
-        setIsLoading(false); // Hide typing indicator
+        setIsLoading(false);
         setMessages((prevMessages) => [
-          { text: 'Welcome! How can I help you with this book?', sender: 'bot' },
-          ...prevMessages, // Prepend the welcome message
+          { text: generateWelcomeMessage(), sender: 'bot' }, // Use dynamic welcome message
+          ...prevMessages,
         ]);
-      }, 1000); // 1-second delay
-    } else if (!isOpen) { // If opening again, clear selected text if any
+      }, 1000);
+    } else if (!isOpen) {
         setCurrentSelectedText(null);
     }
   };
