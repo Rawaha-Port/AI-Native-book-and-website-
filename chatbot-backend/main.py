@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware # Added import
 from pydantic import BaseModel
 from typing import Optional
 
@@ -8,6 +9,31 @@ from langchain.vectorstores import Qdrant
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import RetrievalQA
+
+load_dotenv()
+app = FastAPI() # Added FastAPI app instance
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000", # Frontend Docusaurus URL
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+from src.api.auth import router as auth_router # New import
+
+# Define ChatRequest for the chat endpoint
+class ChatRequest(BaseModel):
+    query: str
+    selected_text: Optional[str] = None
+
+app.include_router(auth_router) # Include the new auth router
 
 # Initialize Qdrant and OpenAI components
 embeddings = OpenAIEmbeddings()
@@ -43,4 +69,3 @@ async def chat_with_rag(request: ChatRequest):
         "answer": response["result"],
         "sources": [{"page_content": doc.page_content, "metadata": doc.metadata} for doc in response["source_documents"]]
     }
-

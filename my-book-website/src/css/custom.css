@@ -28,3 +28,104 @@
   --ifm-color-primary-lightest: #4fddbf;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
+
+/* Custom styles for Auth forms */
+.auth-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: var(--ifm-shadow-md);
+  background-color: var(--ifm-background-color);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.auth-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--ifm-font-color-base);
+}
+
+.auth-form-group input,
+.auth-form-group select {
+  padding: 10px;
+  border: 1px solid var(--ifm-toc-border-color);
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.auth-form-group input:focus,
+.auth-form-group select:focus {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--ifm-color-primary-rgb), 0.2);
+  outline: none;
+}
+
+.auth-form-array-item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 5px;
+  align-items: center;
+}
+
+.auth-form-error {
+  color: var(--ifm-color-danger);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.auth-form-message {
+  color: var(--ifm-color-success);
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Custom button styles for navbar/forms */
+.navbar-signout-button {
+  background-color: var(--ifm-color-danger); /* Red for danger action */
+  color: white;
+  border: none;
+  border-radius: var(--ifm-button-border-radius);
+  padding: var(--ifm-button-padding-vertical) var(--ifm-button-padding-horizontal);
+  font-weight: var(--ifm-font-weight-semibold);
+  cursor: pointer;
+  transition: background-color var(--ifm-transition-fast) ease;
+}
+
+.navbar-signout-button:hover {
+  background-color: var(--ifm-color-danger-dark);
+}
+
+.button--action {
+  background-color: var(--ifm-color-primary);
+  color: white;
+  border: none;
+  font-size: 1.1rem; /* Increased font size */
+}
+
+.button--action:hover {
+  background-color: var(--ifm-color-primary-dark);
+}
+
+/* Ensure NavbarItem buttons have consistent appearance */
+.navbar__item.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  line-height: normal; /* Override Docusaurus default to match button */
+  height: calc(var(--ifm-navbar-height) * 0.75); /* Adjust height */
+  margin-left: 8px; /* Spacing between nav items */
+}

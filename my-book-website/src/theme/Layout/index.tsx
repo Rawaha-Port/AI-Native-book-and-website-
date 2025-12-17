@@ -15,7 +15,10 @@ import LayoutProvider from '@theme/Layout/Provider';
 import ErrorPageContent from '@theme/ErrorPageContent';
 import type {Props} from '@theme/Layout';
 import styles from './styles.module.css';
-import Chatbot from '../../components/Chatbot'; // Import the Chatbot component
+import Chatbot from '../../components/Chatbot'; // Keep this
+import { AuthProvider } from '@site/src/contexts/AuthContext'; // Add this
+import { ToastContainer } from 'react-toastify'; // Add this
+import 'react-toastify/dist/ReactToastify.css'; // Add this
 
 export default function Layout(props: Props): ReactNode {
   const {
@@ -49,30 +52,33 @@ export default function Layout(props: Props): ReactNode {
   }, []);
 
   return (
-    <LayoutProvider>
-      <PageMetadata title={title} description={description} />
+    <AuthProvider> {/* Wrap with AuthProvider */}
+      <LayoutProvider>
+        <PageMetadata title={title} description={description} />
 
-      <SkipToContent />
+        <SkipToContent />
 
-      <AnnouncementBar />
+        <AnnouncementBar />
 
-      <Navbar />
+        <Navbar />
 
-      <div
-        id={SkipToContentFallbackId}
-        className={clsx(
-          ThemeClassNames.layout.main.container,
-          ThemeClassNames.wrapper.main,
-          styles.mainWrapper,
-          wrapperClassName,
-        )}>
-        <ErrorBoundary fallback={(params) => <ErrorPageContent {...params} />}>
-          {children}
-        </ErrorBoundary>
-      </div>
+        <div
+          id={SkipToContentFallbackId}
+          className={clsx(
+            ThemeClassNames.layout.main.container,
+            ThemeClassNames.wrapper.main,
+            styles.mainWrapper,
+            wrapperClassName,
+          )}>
+          <ErrorBoundary fallback={(params) => <ErrorPageContent {...params} />}>
+            {children}
+          </ErrorBoundary>
+        </div>
 
-      {!noFooter && <Footer />}
-      <Chatbot selectedText={selectedText} /> {/* Pass selectedText to Chatbot */}
-    </LayoutProvider>
+        {!noFooter && <Footer />}
+        <Chatbot selectedText={selectedText} /> {/* Keep this */}
+      </LayoutProvider>
+      <ToastContainer position="bottom-right" autoClose={3000} /> {/* Add this */}
+    </AuthProvider>
   );
 }
