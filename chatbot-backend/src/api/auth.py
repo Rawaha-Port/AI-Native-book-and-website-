@@ -1,11 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+from uuid import UUID, uuid4
 
 # Load environment variables
 load_dotenv()
@@ -28,9 +33,7 @@ def get_db():
 # Import models
 from src.models import User, UserProfile, Base # Assuming Base is needed for metadata
 
-# Create tables if they don't exist (for development/initial setup)
-# In production, migrations (Alembic) handle this
-Base.metadata.create_all(bind=engine)
+
 
 
 
@@ -88,22 +91,27 @@ class UserProfileCreate(BaseModel):
     experience_years: Optional[str] = None
     architecture_familiarity: List[str] = []
 
-class UserCreate(BaseModel):
-    email: EmailStr
-    full_name: str
-    password: str
-    profile_data: UserProfileCreate
-
 class UserResponse(BaseModel):
     id: str
     email: EmailStr
     full_name: str
     # Add other fields if needed, but avoid password_hash
 
+class LoginResponse(BaseModel):
+    user: UserResponse
+    profile: Optional[UserProfileCreate] # Use UserProfileCreate as a base, adapt as needed
+    token: str
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    full_name: str
+    password: str
+    profile_data: UserProfileCreate
+
 # --- External Service Imports ---
 from src.services.auth_service import auth_service as better_auth_wrapper, AuthDetails # Our wrapper for better-auth.com and AuthDetails
 
-@router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/signup", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
 async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     # 1. Validate credentials with Better Auth service
     try:
@@ -116,6 +124,7 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Better Auth user ID not returned")
 
     except Exception as e:
+        print(f"Error from better_auth_wrapper.sign_up: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
     # 2. Check if user already exists in our DB (by email, for safety)
@@ -139,7 +148,7 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     # 5. Create UserProfile in our database
     db_profile = UserProfile(
         user_id=db_user.id,
-        languages=user_data.profile_data.languages.json(), # Convert Pydantic model to JSON string/object
+        languages=[lang.dict() for lang in user_data.profile_data.languages],
         frameworks=user_data.profile_data.frameworks,
         experience_years=user_data.profile_data.experience_years,
         architecture_familiarity=user_data.profile_data.architecture_familiarity,
@@ -147,20 +156,29 @@ async def signup(user_data: UserCreate, db: Session = Depends(get_db)):
     db.add(db_profile)
     db.commit()
     db.refresh(db_user)
+    db.refresh(db_profile)
 
-    # Note: Token generation/handling is done in auth_service and might be returned here
-    # For now, we just return the user details.
-    return UserResponse(id=str(db_user.id), email=db_user.email, full_name=db_user.full_name)
+    # 6. Create our own access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(db_user.id)}, expires_delta=access_token_expires
+    )
 
+    profile_data = UserProfileCreate(
+        languages=db_profile.languages,
+        frameworks=db_profile.frameworks,
+        experience_years=db_profile.experience_years,
+        architecture_familiarity=db_profile.architecture_familiarity,
+    )
 
-class LoginResponse(BaseModel):
-    user: UserResponse
-    profile: Optional[UserProfileCreate] # Use UserProfileCreate as a base, adapt as needed
-    token: str
+    return LoginResponse(
+        user=UserResponse(id=str(db_user.id), email=db_user.email, full_name=db_user.full_name),
+        profile=profile_data,
+        token=access_token
+    )
 
 @router.post("/signin", response_model=LoginResponse)
 async def signin(auth_details: AuthDetails, db: Session = Depends(get_db)):
-    # 1. Authenticate with Better Auth service
     try:
         better_auth_response = await better_auth_wrapper.sign_in(auth_details)
         better_auth_id = better_auth_response.get("user", {}).get("id")
@@ -177,7 +195,13 @@ async def signin(auth_details: AuthDetails, db: Session = Depends(get_db)):
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found in our database")
 
-    # 3. Retrieve user profile
+    # 3. Create our own access token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": str(db_user.id)}, expires_delta=access_token_expires
+    )
+
+    # 4. Retrieve user profile
     db_profile_orm = db.query(UserProfile).filter(UserProfile.user_id == db_user.id).first()
     
     profile_data = None
@@ -192,14 +216,12 @@ async def signin(auth_details: AuthDetails, db: Session = Depends(get_db)):
     return LoginResponse(
         user=UserResponse(id=str(db_user.id), email=db_user.email, full_name=db_user.full_name),
         profile=profile_data,
-        token=session_token
+        token=access_token
     )
 
 @router.post("/logout")
 async def logout():
-    response = JSONResponse(content={"message": "Logged out successfully"})
-    response.delete_cookie(key="jwt-token", httponly=True, samesite="Lax", secure=True) # Ensure cookie parameters match creation
-    return response
+    return JSONResponse(content={"message": "Logged out successfully"})
 
 # --- User Profile Endpoints ---
 @router.get("/users/me", response_model=LoginResponse) # Use LoginResponse to return user and profile
@@ -229,7 +251,7 @@ async def update_users_me(
     if not db_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
-    db_profile.languages = profile_update.languages.json()
+    db_profile.languages = [lang.dict() for lang in profile_update.languages]
     db_profile.frameworks = profile_update.frameworks
     db_profile.experience_years = profile_update.experience_years
     db_profile.architecture_familiarity = profile_update.architecture_familiarity

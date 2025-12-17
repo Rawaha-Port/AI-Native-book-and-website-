@@ -2,6 +2,7 @@
   "name": "my-book-website",
   "version": "0.0.0",
   "private": true,
+  "proxy": "http://localhost:8000",
   "scripts": {
     "docusaurus": "docusaurus",
     "start": "docusaurus start",
