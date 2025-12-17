@@ -21,7 +21,7 @@ class AuthService:
         """
         try:
             response = await self.client.post(
-                "/auth/email/signup",
+                "/auth/signup/email",
                 json={"email": auth_details.email, "password": auth_details.password}
             )
             response.raise_for_status()
@@ -36,7 +36,7 @@ class AuthService:
         """
         try:
             response = await self.client.post(
-                "/auth/email/signin",
+                "/auth/signin/email",
                 json={"email": auth_details.email, "password": auth_details.password}
             )
             response.raise_for_status()

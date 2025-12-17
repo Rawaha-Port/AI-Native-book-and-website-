@@ -33,10 +33,7 @@ def get_db():
 # Import models
 from src.models import User, UserProfile, Base # Assuming Base is needed for metadata
 
-
-
-
-
+# (Removed Base.metadata.create_all as it's handled by Alembic migrations)
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -221,7 +218,9 @@ async def signin(auth_details: AuthDetails, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 async def logout():
-    return JSONResponse(content={"message": "Logged out successfully"})
+    response = JSONResponse(content={"message": "Logged out successfully"})
+    response.delete_cookie(key="jwt-token", httponly=True, samesite="Lax", secure=True) # Ensure cookie parameters match creation
+    return response
 
 # --- User Profile Endpoints ---
 @router.get("/users/me", response_model=LoginResponse) # Use LoginResponse to return user and profile
@@ -251,7 +250,7 @@ async def update_users_me(
     if not db_profile:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found")
 
-    db_profile.languages = [lang.dict() for lang in profile_update.languages]
+    db_profile.languages = [lang.dict() for lang in profile_update.languages] # Ensure correct format
     db_profile.frameworks = profile_update.frameworks
     db_profile.experience_years = profile_update.experience_years
     db_profile.architecture_familiarity = profile_update.architecture_familiarity
@@ -261,7 +260,7 @@ async def update_users_me(
     db.refresh(db_profile)
 
     return LoginResponse(
-        user=UserResponse(id=str(current_user.id), email=current_user.email),
+        user=UserResponse(id=str(current_user.id), email=current_user.email, full_name=current_user.full_name),
         profile=profile_update, # Return the updated profile data
         token=""
     )

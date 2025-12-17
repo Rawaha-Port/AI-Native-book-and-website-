@@ -1,20 +1,84 @@
-import React, {type ReactNode} from 'react';
-import Layout from '@theme-original/Layout';
-import type LayoutType from '@theme/Layout';
-import type {WrapperProps} from '@docusaurus/types';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { AuthProvider } from '@site/src/contexts/AuthContext'; // Import AuthProvider
-import Chatbot from '@site/src/components/Chatbot'; // Import Chatbot
+import React, {type ReactNode, useState, useEffect} from 'react';
+import clsx from 'clsx';
+import ErrorBoundary from '@docusaurus/ErrorBoundary';
+import {
+  PageMetadata,
+  SkipToContentFallbackId,
+  ThemeClassNames,
+} from '@docusaurus/theme-common';
+import {useKeyboardNavigation} from '@docusaurus/theme-common/internal';
+import SkipToContent from '@theme/SkipToContent';
+import AnnouncementBar from '@theme/AnnouncementBar';
+import Navbar from '@theme/Navbar';
+import Footer from '@theme/Footer';
+import LayoutProvider from '@theme/Layout/Provider';
+import ErrorPageContent from '@theme/ErrorPageContent';
+import type {Props} from '@theme/Layout';
+import styles from './styles.module.css';
+import Chatbot from '../../components/Chatbot'; // Keep this
+import { AuthProvider } from '@site/src/contexts/AuthContext'; // Add this
+import { ToastContainer } from 'react-toastify'; // Add this
+import 'react-toastify/dist/ReactToastify.css'; // Add this
 
-type Props = WrapperProps<typeof LayoutType>;
+export default function Layout(props: Props): ReactNode {
+  const {
+    children,
+    noFooter,
+    wrapperClassName,
+    // Not really layout-related, but kept for convenience/retro-compatibility
+    title,
+    description,
+  } = props;
 
-export default function LayoutWrapper(props: Props): ReactNode {
+  useKeyboardNavigation();
+
+  const [selectedText, setSelectedText] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      const selection = window.getSelection();
+      if (selection && selection.toString().length > 0) {
+        setSelectedText(selection.toString());
+      } else {
+        setSelectedText(null);
+      }
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
   return (
-    <AuthProvider>
-      <Layout {...props} />
-      <ToastContainer position="bottom-right" autoClose={3000} />
-      <Chatbot selectedText={''} /> {/* Add Chatbot here */}
+    <AuthProvider> {/* Wrap with AuthProvider */}
+      <LayoutProvider>
+        <PageMetadata title={title} description={description} />
+
+        <SkipToContent />
+
+        <AnnouncementBar />
+
+        <Navbar />
+
+        <div
+          id={SkipToContentFallbackId}
+          className={clsx(
+            ThemeClassNames.layout.main.container,
+            ThemeClassNames.wrapper.main,
+            styles.mainWrapper,
+            wrapperClassName,
+          )}>
+          <ErrorBoundary fallback={(params) => <ErrorPageContent {...params} />}>
+            {children}
+          </ErrorBoundary>
+        </div>
+
+        {!noFooter && <Footer />}
+        <Chatbot selectedText={selectedText} /> {/* Keep this */}
+      </LayoutProvider>
+      <ToastContainer position="bottom-right" autoClose={3000} /> {/* Add this */}
     </AuthProvider>
   );
 }
