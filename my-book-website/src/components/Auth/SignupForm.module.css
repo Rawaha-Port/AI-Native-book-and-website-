@@ -1,0 +1,26 @@
+.passwordInputContainer {
+  position: relative;
+  display: flex; /* Ensures input and button are on the same line */
+  align-items: center;
+}
+
+.passwordInput {
+  flex-grow: 1; /* Allows input to take up available space */
+  padding-right: 2.5em; /* Make space for the toggle button */
+}
+
+.passwordToggleButton {
+  position: absolute;
+  right: 0.5em; /* Adjust as needed for spacing from the right */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.2em; /* Adjust icon size */
+  line-height: 1;
+  color: var(--ifm-font-color-base); /* Inherit text color */
+}
+
+.passwordToggleButton:focus {
+  outline: none;
+}

@@ -1,0 +1,8 @@
+# Placeholder for Better Auth OpenAPI Specification
+
+# This file would contain the OpenAPI (Swagger) specification for the authentication
+# endpoints exposed by the better_auth_service, if such a specification were
+# generated or maintained for external consumption.
+#
+# Since better-auth is a library primarily consumed programmatically, its
+# "contract" is largely defined by its TypeScript/JavaScript API.

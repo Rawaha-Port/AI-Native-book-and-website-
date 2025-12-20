@@ -16,8 +16,10 @@ yarn-error.log*
 .env*
 
 # Python backend
-chatbot-backend/__pycache__/
+chatbot-backend/**/__pycache__/
 chatbot-backend/*.pyc
 chatbot-backend/venv/
 chatbot-backend/.venv/
 chatbot-backend/.env
+# Node.js Drizzle migrations output
+chatbot-backend/better_auth_service/drizzle/

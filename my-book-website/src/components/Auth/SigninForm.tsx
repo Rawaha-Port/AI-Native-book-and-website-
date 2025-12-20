@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext'; // Adjust path as needed
 import { useHistory } from '@docusaurus/router'; // Docusaurus router for navigation
+import { toast } from 'react-toastify'; // New import for toast notifications
 
 const SigninForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null); // Removed error state
   const [loading, setLoading] = useState<boolean>(false);
   const { signIn } = useAuth();
   const history = useHistory();
@@ -14,7 +15,7 @@ const SigninForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    // setError(null); // Removed setError call
     try {
       const response = await axios.post('/api/v1/auth/signin', {
         email,
@@ -27,7 +28,7 @@ const SigninForm: React.FC = () => {
       history.push('/profile'); // Redirect to profile page on success
     } catch (err: any) {
       console.error('Signin error:', err.response?.data || err.message);
-      setError(err.response?.data?.detail || 'Signin failed');
+      toast.error(err.response?.data?.detail || 'Signin failed'); // Use toast.error
     } finally {
       setLoading(false);
     }
@@ -37,7 +38,7 @@ const SigninForm: React.FC = () => {
     <div className="auth-container">
       <h2>Sign In</h2>
       <form onSubmit={handleSubmit} className="auth-form">
-        {error && <p className="auth-form-error">{error}</p>}
+        {/* {error && <p className="auth-form-error">{error}</p>} */} {/* Removed local error display */}
         <div className="auth-form-group">
           <label htmlFor="email">Email:</label>
           <input

@@ -6,6 +6,10 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AuthProvider } from '@site/src/contexts/AuthContext'; // Import AuthProvider
 import Chatbot from '@site/src/components/Chatbot'; // Import Chatbot
+import axios from 'axios';
+
+// Set the base URL for all axios requests
+axios.defaults.baseURL = 'http://localhost:8000';
 
 type Props = WrapperProps<typeof LayoutType>;
 

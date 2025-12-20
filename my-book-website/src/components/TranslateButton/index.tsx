@@ -119,7 +119,7 @@ export default function TranslateButton() {
       onClick={handleClick}
       disabled={isLoading || isLoadingTranslation || !currentContentElement} // Disable button while auth or translation is loading
     >
-      {isTranslated ? 'Show Original' : 'Translate to Urdu'}
+      {isTranslated ? 'Show Original' : 'Translate to Urdu (اردو)'}
     </button>
   );
 }

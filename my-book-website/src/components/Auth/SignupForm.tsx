@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../contexts/AuthContext';
 import { useHistory } from '@docusaurus/router';
+import styles from './SignupForm.module.css'; // New import for CSS module
+import { toast } from 'react-toastify'; // New import for toast notifications
 
 interface ProfileData {
   languages: { language: string; level: string }[];
@@ -15,6 +17,7 @@ const SignupForm: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [fullName, setFullName] = useState<string>(''); // New state for full name
   const [password, setPassword] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false); // New state for password visibility
   const [profileData, setProfileData] = useState<ProfileData>({
     languages: [{ language: '', level: 'Beginner' }],
     frameworks: [''],
@@ -22,7 +25,7 @@ const SignupForm: React.FC = () => {
     // devices: [], // Removed
     architecture_familiarity: [''],
   });
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null); // Removed error state
   const [loading, setLoading] = useState<boolean>(false);
   const { signIn } = useAuth();
   const history = useHistory();
@@ -64,7 +67,7 @@ const SignupForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    // setError(null); // Removed setError call
     try {
       const response = await axios.post('/api/v1/auth/signup', {
         email,
@@ -78,7 +81,7 @@ const SignupForm: React.FC = () => {
       history.push('/profile');
     } catch (err: any) {
       console.error('Signup error:', err.response?.data || err.message);
-      setError(err.response?.data?.detail || 'Signup failed');
+      toast.error(err.response?.data?.detail || 'Signup failed'); // Use toast.error
     } finally {
       setLoading(false);
     }
@@ -88,9 +91,9 @@ const SignupForm: React.FC = () => {
     <div className="auth-container">
       <h2>Sign Up</h2>
       <form onSubmit={handleSubmit} className="auth-form">
-        {error && <p className="auth-form-error">{error}</p>}
+        {/* {error && <p className="auth-form-error">{error}</p>} */}{/* Removed local error display */}
         <div className="auth-form-group">
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="email">Email:*</label>
           <input
             type="email"
             id="email"
@@ -101,7 +104,7 @@ const SignupForm: React.FC = () => {
           />
         </div>
         <div className="auth-form-group">
-          <label htmlFor="fullName">Full Name:</label> {/* New Full Name field */}
+          <label htmlFor="fullName">Full Name:*</label> {/* New Full Name field */}
           <input
             type="text"
             id="fullName"
@@ -112,15 +115,26 @@ const SignupForm: React.FC = () => {
           />
         </div>
         <div className="auth-form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
+          <label htmlFor="password">Password:*</label>
+          <div className={styles.passwordInputContainer}> {/* Wrapper for positioning */}
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+              className={styles.passwordInput} // Add class for styling
+            />
+            <button
+              type="button"
+              className={styles.passwordToggleButton}
+              onClick={() => setShowPassword(!showPassword)}
+              disabled={loading}
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'} {/* Unicode eye icons */}
+            </button>
+          </div>
         </div>
 
         {/* User Profile Questions */}
